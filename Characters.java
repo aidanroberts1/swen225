@@ -46,6 +46,8 @@ public class Characters extends Piece
         wasSet = true;
         return wasSet;
     }
+    
+    
 
     public boolean getIsPlayer()
     {

@@ -27,12 +27,14 @@ public class GameMain
     private ArrayList<Weapons> PlayableWeapons = new ArrayList();
     private List<boardSpot> boardSpots;
     private List<BoardEntity> boardEntities;
+    
     //ArrayList<Card> inactive;
     //ArrayList<Card> active;
     public int diceone;
     public int dicetwo;
     public  int numpeople;
     Board aBoard = new Board(PlayableWeapons, ActiveCharacters, PlayableRooms, this);
+    Boolean gameover = false;
     //Deck aDeck = new Deck(active, inactive, this);
 
     //------------------------
@@ -62,18 +64,26 @@ public class GameMain
         fillDeck();
         GenerateMurder();
         dealCards();
-        System.out.println("look at player 0s hand");
-        Player p = Players.get(0);
-        lookAtHand(p);
+        playGame();
 
 
+    }
+    
+    public void playGame() {
+    	while (gameover == false) {
+    		for (Player p : Players) {
+    			takeTurn(p);
+    		}
+    		
+    	}
+    	
     }
 
     public void GenerateMurder(){
         Random MurderRoomNum = new Random();
         Random MurderPlayerNum = new Random();
         Random MurderWeaponNum = new Random();
-        int mr = MurderRoomNum.nextInt(PlayableRooms.size() );
+        int mr = MurderRoomNum.nextInt(10 );
         int mp = MurderPlayerNum.nextInt(ActiveCharacters.size()  );
         int mw = MurderWeaponNum.nextInt(PlayableWeapons.size() );
 
@@ -140,21 +150,148 @@ public class GameMain
         try {
             String answer = br.readLine();
             if (answer.equals("m") || answer.equals("M")){
+            	rollDice();
+            	int totalmove = diceone + dicetwo;
+            	System.out.println("you rolled a " + diceone + " and a "+ dicetwo + " you can move " + totalmove + " tiles");
+            	
+            	
 
             } else if (answer.equals("a") || answer.equals("A")) {
-                System.out.println("The Cards in your hand are ");
-                Iterator<Card> hand = p.getHand().iterator();
-                while (hand.hasNext()) {
-                    System.out.println(hand.next().getName());
+            	boardSpot playerLocation = p.getCharacter().getLocation();
+            	/*
+            	 * figure out if they are in a room
+            	 */
+            	Room roomPLayerIsIn = null;
+            	for (Room r : PlayableRooms) {
+            		ArrayList corn = r.getCorners();
+            		boardSpot tlc = (boardSpot) corn.get(0);
+            		boardSpot blc = (boardSpot) corn.get(1);
+            		boardSpot brc = (boardSpot) corn.get(2);
+            		boardSpot trc = (boardSpot) corn.get(3);
+            		if (playerLocation.getX() >= tlc.getX() && playerLocation.getY() >= tlc.getY()) {
+            			if ( playerLocation.getY() <= blc.getY()) {
+            				if (playerLocation.getX() <= brc.getX() && playerLocation.getY() <= tlc.getY()) {
+            					if( playerLocation.getY() >= trc.getY()) {
+                        			roomPLayerIsIn = r;
+                        		}
+                    		}
+                		}
+            		}
+            	}
+            	if (roomPLayerIsIn == null) {
+            		System.out.println("you cannot make an accusation as you are not in a room");
+            		return;
+            	}
+            	System.out.println("the cards you have seen are ");
+            	for (int i = 0; i < p.getSeen().size(); i++) {
+            		Card m = (Card) p.getSeen().get(i);
+            		System.out.println(m.getName());
+            	}
+            	Iterator<Card> hand = p.getHand().iterator();
+                while(hand.hasNext()){
+                	System.out.println(hand.next().getName());
                 }
+                
+            	/*
+            	 * choose room for accusation
+            	 */
+                
+                System.out.println("the room for your accusation is " + roomPLayerIsIn);
+                
+                
+                Room chosenRoom = roomPLayerIsIn;
+                
+                /*
+                 * choose weapon for arrusation
+                 */
+                System.out.println("The weapons are ");
+                int num = 0;
+                
+                for(Weapons w :PlayableWeapons) {
+                	System.out.println(num + " : " + w.getName());
+                	num++;
+                }
+                System.out.println("please choose a weapon for your accusation");
+                int a = 0;
+                answer = br.readLine();
+                a = Integer.parseInt(answer);
+                Weapons chosenWeapon = PlayableWeapons.get(a);
+                
+                /*
+                 * choose character for accusation
+                 */
+                
+                System.out.println("The characters are ");
+                num = 0;
+                
+                for(Characters c :ActiveCharacters) {
+                	if(!p.getCharacter().getName().contentEquals(c.getName())) {
+                		System.out.println(c.getId() + " : " + c.getName());
+                    	num++;                                                    // dont display the option for the palyers own character
+                	}
+                	
+                }
+                System.out.println("please choose a character for your accusation");
+               
+                answer = br.readLine();
+                a = Integer.parseInt(answer);
+                Characters chosenCharacters = ActiveCharacters.get(a-1);
+                
+                System.out.println("your accusation is " + chosenCharacters.getName() + " in the " + chosenRoom.getName() + " with the " + chosenWeapon.getName());
+                makeAccusation(chosenCharacters, chosenRoom, chosenWeapon);
+                Player accused = null;
+                for (Player pa : Players) {
+                	String name = pa.getCharacter().getName();
+                	if (name.contentEquals(chosenCharacters.getName())) {
+                		accused = pa;
+                	}
+                }
+                Card ca = checkOpsHand(p,accused, chosenRoom, chosenCharacters, chosenWeapon );
+                if(ca == null) {
+                	System.out.println("the accused has no cards you havnet already seen");
+                }
+                System.out.println(accused.getName() + " has shown you " + ca.getName());
+                p.getSeen().add(ca);
+                
+                
+                
             }
         }catch(IOException ioerror){
             System.out.println("io exception");
         }
 
     }
+    
+    public Card checkOpsHand(Player accusaer, Player accused, Room r, Characters c, Weapons w) {
+    	HashSet handofop = accused.getHand();
+    	Iterator<Card> hand = accused.getHand().iterator();
+        while(hand.hasNext())
+        {
+        	String name = hand.next().getName();
+            if(name.contentEquals(r.getName())) {
+            	if (!accusaer.getSeen().contains(hand.next())){
+            		return hand.next();
+            	}
+            	
+            }
+            
+            if(name.contentEquals(c.getName())) {
+            	if (!accusaer.getSeen().contains(hand.next())){
+            		return hand.next();
+            	}
+            }
+			if(name.contentEquals(w.getName())) {
+				if (!accusaer.getSeen().contains(hand.next())){
+					return hand.next();
+				}
+			}
+        }
+        return null;
+    	
+    			
+    }
 
-    public boolean makeAccusation(Card a, Card b, Card c ){
+    public boolean makeAccusation(Characters a, Room b, Weapons c ){
         int count = 0;
         ArrayList<Card> activecards = deck.getActive();
         for (Card card : activecards){
@@ -172,8 +309,11 @@ public class GameMain
             }
         }
         if (count == 3){
+        	System.out.println("your accusation was the correct solution ");
+        	gameover = true;
             return true;
         }
+        System.out.println("your accusation was not the correct soltion");
         return false;
 
     }
@@ -216,7 +356,7 @@ public class GameMain
         }
 
         for (Card c : active) {
-            System.out.println(c.getName());
+            //System.out.println(c.getName());
         }
 
     }
@@ -240,7 +380,7 @@ public class GameMain
                 pos  = pos + Players.size();
             }
             p.setHand(hand);
-            System.out.println(p.getHand().size());
+            //System.out.println(p.getHand().size());
 
 
             i++;
@@ -287,13 +427,15 @@ public class GameMain
             PlayableWeapons.add(a);
         }
     }
+    
+    
     public void GenerateRooms(){
         System.out.println("rooms");
         int pos = 0;
 
 
         try {
-            File file = new File("C:\\Users\\aidan\\IdeaProjects\\SWEN225_A1\\src\\roomData.txt");
+            File file = new File("C:\\Users\\aidan\\eclipse-workspace\\swen225_a1\\src\\roomData.txt");
             Scanner input = new Scanner(file);
             BufferedReader br = new BufferedReader(new FileReader(file));
             input = new Scanner(file);
@@ -347,9 +489,9 @@ public class GameMain
                         j = p + 1;
                     }
 
-                    System.out.println(pos);
+                   // System.out.println(pos);
                     Room r = new Room(aBoard ,name, corners, notAvailable, doors, PlayableRooms.size());
-                    System.out.println("room number is " + PlayableRooms.size());
+                    //System.out.println("room number is " + PlayableRooms.size());
                     pos++;
                     PlayableRooms.add(r);
                 }
@@ -361,13 +503,13 @@ public class GameMain
         }
         System.out.println("clear");
         for (Room r : PlayableRooms) {
+        	/*
             System.out.println(r.getName());
-
-
             System.out.println("corners " + r.getCorners().size());
             System.out.println("not avilable " + r.getNotAvilable().size());
             System.out.println("doors " + r.getDoors().size());
             System.out.println(" ");
+            */
         }
     }
     public void GenerateStartCharacters(){
@@ -478,7 +620,8 @@ public class GameMain
                     p.setCharacter(PlayableCharcters.get(num));
                 }
                 if (player != null) {
-                    System.out.println("You have selected your player,  you are " + PlayableCharcters.get(num).getName() + " and your start postion is ( " + PlayableCharcters.get(num).getLocation() + " )");
+                    System.out.println("You have selected your player,  you are " + PlayableCharcters.get(num).getName() + " and your start postion is ( " + 
+                PlayableCharcters.get(num).getLocation().getX() + "," + PlayableCharcters.get(num).getLocation().getY() + " )");
                 }
             } catch (IOException wronginput) {
                 System.out.println("io exception");
