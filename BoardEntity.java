@@ -5,7 +5,7 @@
 
 // line 69 "model.ump"
 // line 149 "model.ump"
-abstract public class BoardEntity
+public class BoardEntity
 {
 
     //------------------------

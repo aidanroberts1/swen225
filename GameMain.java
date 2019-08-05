@@ -21,10 +21,10 @@ public class GameMain
     private Deck deck;
     private List<Player> players;
     private ArrayList<Player> Players = new ArrayList<>();
-    private ArrayList<Characters> PlayableCharcters = new ArrayList<Characters>();
+    private ArrayList<Characters> PlayableCharcters = new ArrayList();
     private ArrayList<Characters> ActiveCharacters = new ArrayList<>();
-    private ArrayList<Room> PlayableRooms = new ArrayList<Room>();
-    private ArrayList<Weapons> PlayableWeapons = new ArrayList<Weapons>();
+    private ArrayList<Room> PlayableRooms = new ArrayList();
+    private ArrayList<Weapons> PlayableWeapons = new ArrayList();
     private List<boardSpot> boardSpots;
     private List<BoardEntity> boardEntities;
     //ArrayList<Card> inactive;
@@ -39,7 +39,7 @@ public class GameMain
     // CONSTRUCTOR
     //------------------------
 
-	public GameMain()
+    public GameMain()
     {
         /*
         if (aBoard == null || aBoard.getGameMain() != null)
@@ -54,45 +54,26 @@ public class GameMain
         */
         //Deck deck;
         players = new ArrayList<Player>();
-        
+
         GenerateWeapons();
         GenerateRooms();
         GenerateStartCharacters();
         chooseCharacters();
         fillDeck();
-        
-        for (Characters c : ActiveCharacters) {
-        	aBoard.addCharacter(c.getId(), c.getLocation());
-        }
-        
-        ArrayList<Characters> tmp = aBoard.getCharacters();
-        for (Characters c : tmp) {
-        	System.out.println("ID: " + c.id + ", xPos: " + c.getLocation().getX() + ", yPos: " + c.getLocation().getY());
-        }
-        
-        
-        //for (Characters c : ActiveCharacters) {
-        	//c.move(aBoard, 'W');
-        //}
-        
-        System.out.println(aBoard.printArray());	//Just a test for printing out the board.
-        
-        //GenerateMurder();
-        //dealCards();
+        GenerateMurder();
+        dealCards();
+        System.out.println("look at player 0s hand");
+        Player p = Players.get(0);
+        lookAtHand(p);
 
 
     }
 
-
-
-
     public void GenerateMurder(){
-    	/*
         Random MurderRoomNum = new Random();
         Random MurderPlayerNum = new Random();
         Random MurderWeaponNum = new Random();
-        //System.out.println(PlayableRooms.size());
-        //int mr = MurderRoomNum.nextInt(PlayableRooms.size() );
+        int mr = MurderRoomNum.nextInt(PlayableRooms.size() );
         int mp = MurderPlayerNum.nextInt(ActiveCharacters.size()  );
         int mw = MurderWeaponNum.nextInt(PlayableWeapons.size() );
 
@@ -100,7 +81,7 @@ public class GameMain
         for (Characters c : ActiveCharacters){
             CharacterNames.add(c.getName());
         }
-        
+
         ArrayList<Card> activecards = deck.getActive();
         for (Room r : PlayableRooms){
             // get id nu,bers of rooms and match them
@@ -112,7 +93,6 @@ public class GameMain
                 }
             }
         }
-        
         ArrayList<String> weaponnames = new ArrayList<>();
         weaponnames.add("Candlestick");
         weaponnames.add("Dagger");
@@ -150,8 +130,66 @@ public class GameMain
             }
         }
 
-        */
+
     }
+
+    public void takeTurn(Player p){
+        System.out.println("it is " + p.getName() + "'s turn: \n would you like to move or make an accusation? press m for move or a for accusation ");
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        try {
+            String answer = br.readLine();
+            if (answer.equals("m") || answer.equals("M")){
+
+            } else if (answer.equals("a") || answer.equals("A")) {
+                System.out.println("The Cards in your hand are ");
+                Iterator<Card> hand = p.getHand().iterator();
+                while (hand.hasNext()) {
+                    System.out.println(hand.next().getName());
+                }
+            }
+        }catch(IOException ioerror){
+            System.out.println("io exception");
+        }
+
+    }
+
+    public boolean makeAccusation(Card a, Card b, Card c ){
+        int count = 0;
+        ArrayList<Card> activecards = deck.getActive();
+        for (Card card : activecards){
+            if (card.getIsMurderCard()){
+                if (card.getName().equals(a.getName())){
+                    count++;
+                }
+                if (card.getName().equals(b.getName())){
+                    count++;
+                }
+                if (card.getName().equals(c.getName())){
+                    count++;
+                }
+
+            }
+        }
+        if (count == 3){
+            return true;
+        }
+        return false;
+
+    }
+
+    public void lookAtHand(Player p){
+        HashSet h = p.getHand();
+        Iterator<Card> hand = p.getHand().iterator();
+        System.out.println("Player " + p.getName() + "'s hand has in it ");
+        while(hand.hasNext())
+        {
+            System.out.println(hand.next().getName());
+        }
+
+    }
+
+
 
 
     public void fillDeck(){
@@ -180,10 +218,7 @@ public class GameMain
         for (Card c : active) {
             System.out.println(c.getName());
         }
-        System.out.println("inactive cards are ");
-        for (Card c : inactive) {
-            System.out.println(c.getName());
-        }
+
     }
 
     public void dealCards(){
@@ -195,28 +230,27 @@ public class GameMain
         for (Player p : Players){
             HashSet<Card> hand = new HashSet<>();
             for (int j = 0; j <  activecards.size(); j++) {
+                if ((pos + Players.size()) > activecards.size()){
+                    break;
+                }
                 if(!activecards.get(pos).getIsMurderCard()){
                     hand.add(activecards.get(pos));
-                    if ((pos + Players.size()) > activecards.size()){
-                        break;
-                    }
+
                 }
                 pos  = pos + Players.size();
             }
             p.setHand(hand);
+            System.out.println(p.getHand().size());
+
+
             i++;
+            pos = i;
         }
-        System.out.println("please work");
-        System.out.println(Players.get(0).getName());
-        Iterator<Card> k= Players.get(0).getHand().iterator();
-        while(k.hasNext())
-        {
-            System.out.println(k.next());
-        }
+
     }
 
 
-    public GameMain(ArrayList<Weapons> aWeaponsForBoard, ArrayList<Characters> aCharactersForBoard, ArrayList<Room> aRoomsForBoard, ArrayList aActiveForDeck, ArrayList aInactiveForDeck)
+    public GameMain(ArrayList aWeaponsForBoard, ArrayList aCharactersForBoard, ArrayList aRoomsForBoard, ArrayList aActiveForDeck, ArrayList aInactiveForDeck)
     {
         board = new Board(aWeaponsForBoard, aCharactersForBoard, aRoomsForBoard, this);
         deck = new Deck(aActiveForDeck, aInactiveForDeck, this);
@@ -399,17 +433,13 @@ public class GameMain
                 String answer = br.readLine();
                 Characters c = null;
                 for (Characters x : PlayableCharcters){
-                	//System.out.println("======================================== "+ answer +" ======================================");
                     if (x.getName().equals(answer)){
                         c = x;
                     }
                 }
-                HashSet<Card> h = new HashSet<Card>();
+                HashSet h = new HashSet();
                 ArrayList s = new ArrayList();
                 Player p = new Player(h,s, c,i, this, answer);
-                //System.out.println("ID: " + i);
-                //System.out.println("Location: " + c.getLocation().getX());
-                //aBoard.addCharacter(i, c.getLocation());
                 Players.add(p);
             }
 
@@ -519,7 +549,7 @@ public class GameMain
         return 6;
     }
     /* Code from template association_AddMNToOnlyOne */
-    public Player addPlayer(HashSet<Card> aHand, ArrayList aSeen, Characters aCharacter, int aId)
+    public Player addPlayer(HashSet aHand, ArrayList aSeen, Characters aCharacter, int aId)
     {
         if (numberOfPlayers() >= maximumNumberOfPlayers())
         {
