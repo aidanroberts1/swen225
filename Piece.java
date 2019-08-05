@@ -5,7 +5,7 @@
 
 // line 54 "model.ump"
 // line 123 "model.ump"
-public class Piece extends BoardEntity
+abstract public class Piece extends BoardEntity
 {
 
     //------------------------
@@ -64,6 +64,8 @@ public class Piece extends BoardEntity
     {
         super.delete();
     }
+    
+    abstract void move(Board b, char dir);
 
 
     public String toString()
