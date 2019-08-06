@@ -159,26 +159,38 @@ public class GameMain
         while (!hasMadeAccusation) {
 	    	
         	if (updateMap) {System.out.println(aBoard.printArray()); updateMap = false;}	//update board
+        	
+        	String options = "";
 	    	System.out.println(p.getName() + " its your turn: \n");
 	    	System.out.println("You rolled a " + diceone + " and a "+ dicetwo + " you can move " + totalMove + " tiles\n");
-	        System.out.println("What would you like to do?\n\n"
-	        					+ "	m) Move\n"
-	        					+ "	a) Make an accusation\n"
-	        					+ "	s) Show map key\n"
-	        					+ "	h) Look at cards you have seen\n");
+	        System.out.println("What would you like to do?\n");
+	        
+	        options += "\ts) Show map key\n";
+	        options += "\th) Look at cards you have seen\n";
+	        if(p.getCharacter().getRoom() == ' ' && totalMove > 0) {	//if not in a room
+	        	options += "\tm) Move\n";
+	        } else if (p.getCharacter().getRoom() != ' ') {
+	        	options += "\ta) Make an accusation\n";
+	        	options += "\tl) Leave room\n";
+	        }
+	        options += "\tx) End turn\n";
+	        System.out.println(options);
 	        InputStreamReader isr = new InputStreamReader(System.in);
 	        BufferedReader br = new BufferedReader(isr);
 	        try {
 	            String answer = br.readLine();
-	            if (answer.equals("m") || answer.equals("M")){
+	            if (answer.equals("m") || answer.equals("M")){			//HANDLE MOVE
 	            	carryOutMove(p.getCharacter());
 	            	updateMap = true;
-	            } else if (answer.equals("h") || answer.equals("H")) {
+	            } else if (answer.equals("h") || answer.equals("H")) {	//HANDLE LOOK AT HAND
 	            	lookAtHand(p);
-	            } else if (answer.equals("s") || answer.equals("S")) {
+	            } else if (answer.equals("s") || answer.equals("S")) {	//HANDLE LEAVE ROOM
+	            	carryOutLeaveRoom(p.getCharacter());
+	            	updateMap = true;
+	            } else if (answer.equals("s") || answer.equals("S")) {	//HANDLE SHOW SEEN
 	            	System.out.println(showBoardDetails());
 	            	updateMap = true;
-	            } else if (answer.equals("a") || answer.equals("A")) {
+	            } else if (answer.equals("a") || answer.equals("A")) {	//HANDLE SHOW ACCUSATION
 	            	boardSpot playerLocation = p.getCharacter().getLocation();
 	            	//System.out.println("" + "" + );
 	            	/*
@@ -242,7 +254,6 @@ public class GameMain
 		                
 		                System.out.println("The characters are ");
 		                num = 0;
-		                
 		                for(Characters c :ActiveCharacters) {
 		                	if(!p.getCharacter().getName().contentEquals(c.getName())) {
 		                		System.out.println(c.getId() + " : " + c.getName());
@@ -283,6 +294,28 @@ public class GameMain
 	        System.out.println("");
 	    }
         totalMove = 0;
+    }
+    
+    private void carryOutLeaveRoom(Characters c) {
+    	
+    	InputStreamReader isr = new InputStreamReader(System.in);
+    	BufferedReader br = new BufferedReader(isr);
+    	
+    	System.out.println("What Door do you want to leave through?\n\n");
+    	
+    	String direction;
+		try {
+			direction = br.readLine();
+			if(direction.equalsIgnoreCase("X")) {return;}
+			if(direction.equalsIgnoreCase("N")) {if(c.move(aBoard, 'N')) {totalMove--;}}
+	    	if(direction.equalsIgnoreCase("S")) {if(c.move(aBoard, 'S')) {totalMove--;}}
+	    	if(direction.equalsIgnoreCase("E")) {if(c.move(aBoard, 'E')) {totalMove--;}}
+	    	if(direction.equalsIgnoreCase("W")) {if(c.move(aBoard, 'W')) {totalMove--;}}
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
     }
     
     private void carryOutMove(Characters c) {

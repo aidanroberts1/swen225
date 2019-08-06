@@ -439,16 +439,6 @@ public class Board
 	    				c.setLocation(b);//update location
 	    			}
 	    		}
-	    		
-	    	    //if(room == 'K') {}
-	    	    //if(room == 'D') {}
-	    	    //if(room == 'L') {}
-	    	    //if(room == 'B') {}
-	    	    //if(room == 'C') {}
-	    	    //if(room == 'I') {}
-	    	    //if(room == 'R') {}
-	    	    //if(room == 'S') {}
-	    	    //if(room == 'H') {}
 	    	        		
     			
     		} else {	//handle moving a boardspot.
@@ -505,8 +495,37 @@ public class Board
      * Leave room though a given door and update
      * new position.
      */
-    public void leaveRoom() {
+    public void leaveRoom(char ID, boardSpot exitDoor) {
+    	char doorDirection = boardArray[exitDoor.getY()][exitDoor.getX()];	//n,e,s and w etc...
     	
+    	Characters c = null;
+		for (int i = 0; i < characters.size(); i++) {
+			if(characters.get(i).getId() == Character.getNumericValue(ID)) {			// find character
+				c = characters.get(i);
+			}
+		}
+    	
+		boardSpot newSpot = null;
+    	if (doorDirection == 'n') {		// Set board with player outside the door & update players 'room'
+    		boardArray[exitDoor.getY()-1][exitDoor.getX()] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX(), exitDoor.getY()-1, true);
+    	}
+    	if (doorDirection == 'e') {
+    		boardArray[exitDoor.getY()][exitDoor.getX()+1] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX()+1, exitDoor.getY(), true);
+    	}
+    	if (doorDirection == 's') {
+    		boardArray[exitDoor.getY()+1][exitDoor.getX()] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX(), exitDoor.getY()+1, true);
+    	}
+    	if (doorDirection == 'w') {
+    		boardArray[exitDoor.getY()][exitDoor.getX()-1] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX()-1, exitDoor.getY(), true);
+    	}
     }
     
     
