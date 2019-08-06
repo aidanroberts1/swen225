@@ -31,7 +31,7 @@ public class Room extends BoardEntity
     private String name;
     private ArrayList corners;
     private ArrayList notAvilable;
-    private ArrayList doors;
+    private ArrayList<boardSpot> doors;
     private int IDnumber;
 
     //------------------------
@@ -46,7 +46,7 @@ public class Room extends BoardEntity
     // CONSTRUCTOR
     //------------------------
 
-    public Room(Board aBoard, String aName, ArrayList aCorners, ArrayList aNotAvailable, ArrayList aDoors, int aIDnumber)
+    public Room(Board aBoard, String aName, ArrayList aCorners, ArrayList aNotAvailable, ArrayList<boardSpot> aDoors, int aIDnumber)
     {
         super(aBoard);
         name = aName;

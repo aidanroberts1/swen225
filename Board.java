@@ -29,16 +29,16 @@ public class Board
     		 					  {'K','K','K','K','K','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ','n','C','C','C','C','C'},//4
     		 					  {'K','K','K','K','K','K',' ',' ','e','B','B','B','B','B','B','w',' ',' ',' ','C','C','C','C','X'},//5
     		 					  {'X','K','K','K','n','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ',' ',' ',' ',' ',' ',' '},//6
-    		 					  {' ',' ',' ',' ',' ',' ',' ',' ','B','B','B','B','B','B','B','B',' ',' ',' ',' ',' ',' ',' ','X'},//7
+    		 					  {' ',' ',' ',' ',' ',' ',' ',' ','B','n','B','B','B','B','n','B',' ',' ',' ',' ',' ',' ',' ','X'},//7
     		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//8
     		 					  {'D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','e','I','I','I','I','I'},//9
-    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//10
-    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//11
-    		 					  {'D','D','D','D','D','D','D','w',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','n','I'},//12
-    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','X'},//13
-    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','s','R','R','X'},//14
-    		 					  {'D','D','D','D','D','D','n','D',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','R','R','R','R','R'},//15
-    		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','e','R','R','R','R','R','R'},//16
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ','X','X','X','X','X',' ',' ',' ','I','I','I','I','I','I'},//10
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ','X','X','X','X','X',' ',' ',' ','I','I','I','I','I','I'},//11
+    		 					  {'D','D','D','D','D','D','D','w',' ',' ','X','X','X','X','X',' ',' ',' ','I','I','I','I','n','I'},//12
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ','X','X','X','X','X',' ',' ',' ',' ',' ',' ',' ',' ','X'},//13
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ','X','X','X','X','X',' ',' ',' ','R','R','s','R','R','X'},//14
+    		 					  {'D','D','D','D','D','D','n','D',' ',' ','X','X','X','X','X',' ',' ','R','R','R','R','R','R','R'},//15
+    		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ',' ','X','X','X','X','X',' ',' ','e','R','R','R','R','R','R'},//16
     		 					  {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','R','R','R','R','R'},//17
     		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ','H','H','s','s','H','H',' ',' ',' ','R','R','R','R','R','X'},//18
     		 					  {'L','L','L','L','L','L','s',' ',' ','H','H','H','H','H','H',' ',' ',' ',' ',' ',' ',' ',' ',' '},//19
@@ -500,6 +500,7 @@ public class Board
     	
     	Characters c = null;
 		for (int i = 0; i < characters.size(); i++) {
+			//System.out.println("IF: " + characters.get(i).getId() + " =" + Character.getNumericValue(ID));
 			if(characters.get(i).getId() == Character.getNumericValue(ID)) {			// find character
 				c = characters.get(i);
 			}
@@ -507,25 +508,27 @@ public class Board
     	
 		boardSpot newSpot = null;
     	if (doorDirection == 'n') {		// Set board with player outside the door & update players 'room'
-    		boardArray[exitDoor.getY()-1][exitDoor.getX()] = ID;
-    		c.setRoom(' ');
-    		newSpot = new boardSpot(exitDoor.getX(), exitDoor.getY()-1, true);
-    	}
-    	if (doorDirection == 'e') {
-    		boardArray[exitDoor.getY()][exitDoor.getX()+1] = ID;
-    		c.setRoom(' ');
-    		newSpot = new boardSpot(exitDoor.getX()+1, exitDoor.getY(), true);
-    	}
-    	if (doorDirection == 's') {
     		boardArray[exitDoor.getY()+1][exitDoor.getX()] = ID;
     		c.setRoom(' ');
     		newSpot = new boardSpot(exitDoor.getX(), exitDoor.getY()+1, true);
     	}
-    	if (doorDirection == 'w') {
+    	if (doorDirection == 'e') {
     		boardArray[exitDoor.getY()][exitDoor.getX()-1] = ID;
     		c.setRoom(' ');
     		newSpot = new boardSpot(exitDoor.getX()-1, exitDoor.getY(), true);
     	}
+    	if (doorDirection == 's') {
+    		boardArray[exitDoor.getY()-1][exitDoor.getX()] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX(), exitDoor.getY()-1, true);
+    	}
+    	if (doorDirection == 'w') {
+    		boardArray[exitDoor.getY()][exitDoor.getX()+1] = ID;
+    		c.setRoom(' ');
+    		newSpot = new boardSpot(exitDoor.getX()+1, exitDoor.getY(), true);
+    	}
+    	
+    	c.setLocation(newSpot);
     }
     
     
