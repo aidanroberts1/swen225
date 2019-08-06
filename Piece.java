@@ -65,7 +65,7 @@ abstract public class Piece extends BoardEntity
         super.delete();
     }
     
-    abstract void move(Board b, char dir);
+    abstract boolean move(Board b, char dir);
 
 
     public String toString()

@@ -16,11 +16,21 @@ public class Characters extends Piece
     private boolean isPlayer;
     int id;
     public boardSpot location;
+    public char room = ' ';
 
     //------------------------
     // CONSTRUCTOR
     //------------------------
 
+    public void setRoom(char c) {
+    	room = c;
+    }
+    public char getRoom() {
+    	return this.room;
+    
+    }
+    
+    
     public int getId() {
         return id;
     }
@@ -58,25 +68,26 @@ public class Characters extends Piece
         super.delete();
     }
     
-    public void move(Board b, char dir) {
+    public boolean move(Board b, char dir) {
     	
     	if (dir == 'N') {
     		System.out.println(this.id + " is moving north");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 0, -1, 'n');
+    		if(b.move(this.getLocation().getX(), this.getLocation().getY(), 0, -1, 'n')) {return true;} else {return false;}
     	}
     	if (dir == 'E') {
     		System.out.println(this.id + " is moving east");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 1, 0, 'e');
+    		if(b.move(this.getLocation().getX(), this.getLocation().getY(), 1, 0, 'e')) {return true;}  else {return false;}
     		}
     	if (dir == 'S') {
     		System.out.println(this.id + " is moving south");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 0, 1, 's');
+    		if(b.move(this.getLocation().getX(), this.getLocation().getY(), 0, 1, 's')) {return true;} else {return false;}
     		}
     	if (dir == 'W') {
     		System.out.println(this.id + " is moving west");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), -1, 0, 'w');
+    		if(b.move(this.getLocation().getX(), this.getLocation().getY(), -1, 0, 'w')) {return true;} else {return false;}
     	}
     	
+    	return false;
     	
     }
 

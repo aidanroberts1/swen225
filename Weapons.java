@@ -31,8 +31,8 @@ public class Weapons extends Piece
     }
 
 	@Override
-	void move(Board b, char dir) {
-		// TODO Auto-generated method stub
+	boolean move(Board b, char dir) {
+		return false;
 		
 	}
     

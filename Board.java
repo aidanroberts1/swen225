@@ -389,8 +389,11 @@ public class Board
     
     /**
      * Moves a given tile in a given direction
+     * returns true if has moved, flase is has not.
      */
-    public void move(int x, int y, int dx, int dy, char dir) {
+    public boolean move(int x, int y, int dx, int dy, char dir) {
+    	boolean hasMoved = false;
+    	
     	int newX = x+dx;
     	int newY = y+dy;
     	char direction = dir;
@@ -408,7 +411,7 @@ public class Board
 	    		boardSpot b = null;
 	    		
 	    		if(newLocation == 'n') {
-	    			room = boardArray[newY+1][newX];
+	    			room = boardArray[newY-1][newX];
 	    			b = new boardSpot(newX, newY+1, true);
 	    			System.out.println("You move north into the room");
     	        }
@@ -418,7 +421,7 @@ public class Board
 	    			System.out.println("You move east into the room");
     	        }
 	    		if(newLocation == 's') {
-	    			room = boardArray[newY-1][newX];
+	    			room = boardArray[newY+1][newX];
 	    			b = new boardSpot(newX, newY-1, true);
 	    			System.out.println("You move south into the room");
     	        }
@@ -430,8 +433,9 @@ public class Board
 	    	
 	    		Characters c = null;
 	    		for (int i = 0; i < characters.size(); i++) {
-	    			if(characters.get(i).getId() == ID) {
+	    			if(characters.get(i).getId() == Character.getNumericValue(ID)) {
 	    				c = characters.get(i);
+	    				c.setRoom(room);
 	    				c.setLocation(b);//update location
 	    			}
 	    		}
@@ -456,13 +460,13 @@ public class Board
 	    		for (int i = 0; i < characters.size(); i++) {
 	    			if(characters.get(i).getId() == Character.getNumericValue(ID)) {
 	    				characters.get(i).setLocation(b);
+	    				characters.get(i).setRoom(newLocation);
 	    			}
 	    		}
     		}
-        	
+    		hasMoved = true;
     	}
-    	
-    	
+    	return hasMoved;
     }
     
     public boolean moveIsValid(int newXpos, int newYpos, char dir) {
