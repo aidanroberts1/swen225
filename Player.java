@@ -151,7 +151,8 @@ public class Player
             placeholderGameMain.removePlayer(this);
         }
     }
-
+    
+    
 
     public String toString()
     {
