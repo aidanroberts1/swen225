@@ -67,6 +67,7 @@ public class GameMain
         fillDeck();
         GenerateMurder();
         dealCards();
+        
         for (Characters c : ActiveCharacters) {
         	aBoard.addCharacter(c.getId(), c.getLocation());	//add chars to board
         }
@@ -76,12 +77,19 @@ public class GameMain
     }
     
     public void playGame() {
-    	while (gameover == false) {
+    	while (!gameover) {
     		for (Player p : Players) {
+    			if (gameover) {
+    				System.out.println("YAYYYY GAME OVER for real ");
+    				GameIsOver();
+    				return;
+    			}
     			takeTurn(p);
     		}
     		
     	}
+    	
+    	
     	
     }
 
@@ -90,6 +98,7 @@ public class GameMain
         Random MurderPlayerNum = new Random();
         Random MurderWeaponNum = new Random();
         int mr = MurderRoomNum.nextInt(10 );
+        
         int mp = MurderPlayerNum.nextInt(ActiveCharacters.size()  );
         int mw = MurderWeaponNum.nextInt(PlayableWeapons.size() );
 
@@ -99,9 +108,10 @@ public class GameMain
         }
 
         ArrayList<Card> activecards = deck.getActive();
+        
         for (Room r : PlayableRooms){
             // get id numbers of rooms and match them
-            if (r.getIDnumber() == mr){
+            if (r.getIDnumber() == 8){                // CHNAHE THIS 
                 for (Card c : activecards){
                     if (c.getName().equals(r.getName())){
                         c.setIsMurderCard(true);
@@ -134,6 +144,7 @@ public class GameMain
         for (Card c : activecards){
             if (c.getName().equals(murderperson)){
                 c.setIsMurderCard(true);
+                System.out.println("murder card is " + c.getName());
             }
         }
 
@@ -184,107 +195,27 @@ public class GameMain
 	            	updateMap = true;
 	            } else if (answer.equals("h") || answer.equals("H")) {	//HANDLE LOOK AT HAND
 	            	lookAtHand(p);
-	            } else if (answer.equals("s") || answer.equals("S")) {	//HANDLE LEAVE ROOM
+	            } else if (answer.equals("l") || answer.equals("L")) {	//HANDLE LEAVE ROOM
 	            	carryOutLeaveRoom(p.getCharacter());
 	            	updateMap = true;
 	            } else if (answer.equals("s") || answer.equals("S")) {	//HANDLE SHOW SEEN
 	            	System.out.println(showBoardDetails());
 	            	updateMap = true;
-	            } else if (answer.equals("a") || answer.equals("A")) {	//HANDLE SHOW ACCUSATION
-	            	boardSpot playerLocation = p.getCharacter().getLocation();
-	            	//System.out.println("" + "" + );
-	            	/*
-	            	 * figure out if they are in a room
-	            	 */
-	            	Room roomPLayerIsIn = null;
-	            	char playersRoom = p.getCharacter().getRoom();
-	            	System.out.println("PLAYERS ROOM: " + playersRoom);
-	            	if (playersRoom == 'K') {roomPLayerIsIn = PlayableRooms.get(0);}
-	            	if (playersRoom == 'D') {roomPLayerIsIn = PlayableRooms.get(1);}
-	            	if (playersRoom == 'L') {roomPLayerIsIn = PlayableRooms.get(2);}
-	            	if (playersRoom == 'H') {roomPLayerIsIn = PlayableRooms.get(3);}
-	            	if (playersRoom == 'S') {roomPLayerIsIn = PlayableRooms.get(4);}
-	            	if (playersRoom == 'R') {roomPLayerIsIn = PlayableRooms.get(5);}
-	            	if (playersRoom == 'I') {roomPLayerIsIn = PlayableRooms.get(6);}
-	            	if (playersRoom == 'C') {roomPLayerIsIn = PlayableRooms.get(7);}
-	            	if (playersRoom == 'B') {roomPLayerIsIn = PlayableRooms.get(8);}
+	            } else if (answer.equals("a") || answer.equals("A")) {	//HANDLE ACCUSATION
 	            	
-	            	if (roomPLayerIsIn == null) {
-	            		System.out.println("you cannot make an accusation as you are not in a room");
-	            		hasMadeAccusation = false;
+	            	if (carryOutAccusation(p)) {
+	            		System.out.println("game over is " + gameover.booleanValue());
+	            		if (gameover) {
+	            			hasMadeAccusation = true;
+	            			return; 
+	            		}
+	            		hasMadeAccusation = true;
+	            		
 	            	} else {
-		            	System.out.println("the cards you have seen are ");
-		            	for (int i = 0; i < p.getSeen().size(); i++) {
-		            		Card m = (Card) p.getSeen().get(i);
-		            		System.out.println(m.getName());
-		            	}
-		            	Iterator<Card> hand = p.getHand().iterator();
-		                while(hand.hasNext()){
-		                	System.out.println(hand.next().getName());
-		                }
-		                
-		            	/*
-		            	 * choose room for accusation
-		            	 */
-		                
-		                System.out.println("the room for your accusation is " + roomPLayerIsIn);
-		                
-		                
-		                Room chosenRoom = roomPLayerIsIn;
-		                
-		                /*
-		                 * choose weapon for accusation
-		                 */
-		                System.out.println("The weapons are ");
-		                int num = 0;
-		                
-		                for(Weapons w :PlayableWeapons) {
-		                	System.out.println(num + " : " + w.getName());
-		                	num++;
-		                }
-		                System.out.println("please choose a weapon for your accusation");
-		                int a = 0;
-		                answer = br.readLine();
-		                a = Integer.parseInt(answer);
-		                Weapons chosenWeapon = PlayableWeapons.get(a);
-		                
-		                /*
-		                 * choose character for accusation
-		                 */
-		                
-		                System.out.println("The characters are ");
-		                num = 0;
-		                for(Characters c :ActiveCharacters) {
-		                	if(!p.getCharacter().getName().contentEquals(c.getName())) {
-		                		System.out.println(c.getId() + " : " + c.getName());
-		                    	num++;                                                    // dont display the option for the palyers own character
-		                	}
-		                	
-		                }
-		                System.out.println("please choose a character for your accusation");
-		               
-		                answer = br.readLine();
-		                a = Integer.parseInt(answer);
-		                Characters chosenCharacters = ActiveCharacters.get(a-1);
-		                
-		                System.out.println("your accusation is " + chosenCharacters.getName() + " in the " + chosenRoom.getName() + " with the " + chosenWeapon.getName());
-		                makeAccusation(chosenCharacters, chosenRoom, chosenWeapon);
-		                Player accused = null;
-		                for (Player pa : Players) {
-		                	String name = pa.getCharacter().getName();
-		                	if (name.contentEquals(chosenCharacters.getName())) {
-		                		accused = pa;
-		                	}
-		                }
-		                Card ca = checkOpsHand(p,accused, chosenRoom, chosenCharacters, chosenWeapon );
-		                if(ca == null) {
-		                	System.out.println("the accused has no cards you havnet already seen");
-		                }
-		                System.out.println(accused.getName() + " has shown you " + ca.getName());
-		                p.getSeen().add(ca);
-		                hasMadeAccusation = true;
+	            		hasMadeAccusation = false;
 	            	}
-	                
+	            
+	            	
 	                
 	                
 	            }
@@ -295,6 +226,146 @@ public class GameMain
 	    }
         totalMove = 0;
     }
+    
+    private boolean carryOutAccusation(Player p) {
+    	 InputStreamReader isr = new InputStreamReader(System.in);
+	     BufferedReader br = new BufferedReader(isr);
+    	try { 
+    		
+    	String answer = " ";
+    	boardSpot playerLocation = p.getCharacter().getLocation();
+    	//System.out.println("" + "" + );
+    	/*
+    	 * figure out if they are in a room
+    	 */
+    	Room roomPLayerIsIn = null;
+    	char playersRoom = p.getCharacter().getRoom();
+    	System.out.println("PLAYERS ROOM: " + playersRoom);
+    	if (playersRoom == 'K') {roomPLayerIsIn = PlayableRooms.get(0);}
+    	if (playersRoom == 'D') {roomPLayerIsIn = PlayableRooms.get(1);}
+    	if (playersRoom == 'L') {roomPLayerIsIn = PlayableRooms.get(2);}
+    	if (playersRoom == 'H') {roomPLayerIsIn = PlayableRooms.get(3);}
+    	if (playersRoom == 'S') {roomPLayerIsIn = PlayableRooms.get(4);}
+    	if (playersRoom == 'R') {roomPLayerIsIn = PlayableRooms.get(5);}
+    	if (playersRoom == 'I') {roomPLayerIsIn = PlayableRooms.get(6);}
+    	if (playersRoom == 'C') {roomPLayerIsIn = PlayableRooms.get(7);}
+    	if (playersRoom == 'B') {roomPLayerIsIn = PlayableRooms.get(8);}
+    	
+    	if (roomPLayerIsIn == null) {
+    		System.out.println("you cannot make an accusation as you are not in a room");
+    		return false;
+    	} else {
+        	System.out.println("the cards you have seen are ");
+        	for (int i = 0; i < p.getSeen().size(); i++) {
+        		Card m = (Card) p.getSeen().get(i);
+        		System.out.println(m.getName());
+        	}
+        	Iterator<Card> hand = p.getHand().iterator();
+            while(hand.hasNext()){
+            	System.out.println(hand.next().getName());
+            }
+            
+        	/*
+        	 * choose room for accusation
+        	 */
+            
+            System.out.println("the room for your accusation is " + roomPLayerIsIn.getName());
+            
+            
+            Room chosenRoom = roomPLayerIsIn;
+            
+            /*
+             * choose weapon for accusation
+             */
+            System.out.println("The weapons are ");
+            int num = 0;
+            
+            for(Weapons w :PlayableWeapons) {
+            	System.out.println(num + " : " + w.getName());
+            	num++;
+            }
+            System.out.println("please choose a weapon for your accusation");
+            int a = 0;
+            answer = br.readLine();
+            try { 
+            	a = Integer.parseInt(answer);
+            }catch (NumberFormatException wronginput) {
+                System.out.println("please enter a number NOT letters or text ");
+            }
+            Weapons chosenWeapon = PlayableWeapons.get(a);
+            
+            /*
+             * choose character for accusation
+             */
+            
+            System.out.println("The other players are ");
+            num = 0;
+            for (Player player : Players) {
+            	String playerName = p.getName();
+            	String thisPlayerName = player.getName();
+            	if(!playerName.equals(thisPlayerName)) {
+            		System.out.println(player.getId() + " : " + player.getName());
+            	}
+            }
+            
+            System.out.println("please choose a player for your accusation");
+           
+            answer = br.readLine();
+            
+           try {
+            	a = Integer.parseInt(answer);
+            }catch (NumberFormatException wronginput) {
+                System.out.println("please enter a number NOT letters or text ");
+            }
+            Player  playerofselected = Players.get(a);
+            System.out.println("you are accusing " + playerofselected.getName());
+            
+            System.out.println("now please choose a character to accuse");
+            
+            for (Characters chars : ActiveCharacters) {
+            	System.out.println(chars.getId() + " : " + chars.getName());
+            }
+            answer = br.readLine();
+            a = Integer.parseInt(answer);
+            Characters chosenCharacters = ActiveCharacters.get(a);
+            
+            System.out.println("your accusation is " + chosenCharacters.getName() + " in the " + chosenRoom.getName() + " with the " + chosenWeapon.getName());
+            if (makeAccusation(chosenCharacters, chosenRoom, chosenWeapon)) {
+            	System.out.println("yay game over ");
+            	return true; 
+            }
+            
+            
+            
+            
+            
+            
+            
+            Player accused = null;
+            for (Player pa : Players) {
+            	String name = pa.getCharacter().getName();
+            	if (name.contentEquals(chosenCharacters.getName())) {
+            		accused = pa;
+            	}
+            }
+            accused = playerofselected;
+            Card ca = checkOpsHand(p, accused, chosenRoom, chosenCharacters, chosenWeapon );
+            if(ca == null) {
+            	System.out.println("the accused has no cards you havnet already seen");
+            } else {
+	            System.out.println(accused.getName() + " has shown you " + ca.getName());
+	            p.getSeen().add(ca);
+            }
+            return true;
+    	}
+    	}catch (IOException ioerror) {
+    		System.out.println("io error");
+    	}
+		return false;
+    	
+    }
+    
+   
     
     private void carryOutLeaveRoom(Characters c) {
     	
@@ -362,25 +433,30 @@ public class GameMain
 
 
 	public Card checkOpsHand(Player accusaer, Player accused, Room r, Characters c, Weapons w) {
+		System.out.println("accuser is " + accusaer.getName());
+		System.out.println("accused is " + accused.getName());
+		
     	HashSet handofop = accused.getHand();
     	Iterator<Card> hand = accused.getHand().iterator();
+    	System.out.println("size of hand of accused is " + handofop.size());
         while(hand.hasNext())
         {
         	String name = hand.next().getName();
+        	Card cardtest = hand.next();
             if(name.contentEquals(r.getName())) {
-            	if (!accusaer.getSeen().contains(hand.next())){
+            	if (!(accusaer.getSeen().contains(cardtest))){
             		return hand.next();
             	}
             	
             }
             
             if(name.contentEquals(c.getName())) {
-            	if (!accusaer.getSeen().contains(hand.next())){
+            	if (!(accusaer.getSeen().contains(cardtest))){
             		return hand.next();
             	}
             }
 			if(name.contentEquals(w.getName())) {
-				if (!accusaer.getSeen().contains(hand.next())){
+				if (!(accusaer.getSeen().contains(cardtest))){
 					return hand.next();
 				}
 			}
@@ -410,11 +486,16 @@ public class GameMain
         if (count == 3){
         	System.out.println("your accusation was the correct solution ");
         	gameover = true;
+        	
             return true;
         }
-        System.out.println("your accusation was not the correct soltion");
+        System.out.println("your accusation was not the correct solution");
         return false;
 
+    }
+    
+    public void GameIsOver() {
+    	
     }
 
     public void lookAtHand(Player p){
@@ -539,7 +620,7 @@ public class GameMain
 
 
         try {
-            File file = new File("C:\\Users\\Domin\\eclipse-workspace\\swen-225-joint-v2\\src\\roomData.txt");
+            File file = new File("C:\\Users\\aidan\\eclipse-workspace\\swen225_a1\\src\\roomData.txt");
             Scanner input = new Scanner(file);
             BufferedReader br = new BufferedReader(new FileReader(file));
             input = new Scanner(file);
@@ -661,12 +742,16 @@ public class GameMain
     public void chooseCharacters() {
         numpeople = -1;
         try {
-            while (numpeople < 0 || numpeople > 7) {
-                System.out.println("How many people would like to play ? (max 6 players)");
+            while (numpeople < 3 || numpeople > 7) {
+                System.out.println("How many people would like to play ? (min 3 players : max 6 players)");
                 InputStreamReader isr = new InputStreamReader(System.in);
                 BufferedReader br = new BufferedReader(isr);
                 String answer = br.readLine();
-                numpeople = Integer.parseInt(answer);
+                try {
+                	numpeople = Integer.parseInt(answer);
+                }catch (NumberFormatException wronginput) {
+                    System.out.println("please enter a number NOT letters or text ");
+                }
             }
         } catch (IOException ioerror) {
             System.out.println("io exception");
@@ -713,7 +798,11 @@ public class GameMain
                 BufferedReader br = new BufferedReader(isr);
 
                 String answer = br.readLine();
-                num = Integer.parseInt(answer);
+                try {
+                	num = Integer.parseInt(answer);
+                }catch (NumberFormatException wronginput) {
+                    System.out.println("please enter a number NOT letters or text ");
+                }
 
                 System.out.println("you have selected " + PlayableCharcters.get(num).getName() + " if this is correct please press y, else press n ");
                 confirm = br.readLine();
