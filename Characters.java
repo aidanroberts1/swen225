@@ -15,7 +15,6 @@ public class Characters extends Piece
     //Characters Attributes
     private boolean isPlayer;
     int id;
-    public boardSpot location;
 
     //------------------------
     // CONSTRUCTOR
@@ -47,6 +46,8 @@ public class Characters extends Piece
         wasSet = true;
         return wasSet;
     }
+    
+    
 
     public boolean getIsPlayer()
     {
@@ -56,28 +57,6 @@ public class Characters extends Piece
     public void delete()
     {
         super.delete();
-    }
-    
-    public void move(Board b, char dir) {
-    	
-    	if (dir == 'N') {
-    		System.out.println(this.id + " is moving north");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 0, -1, 'n');
-    	}
-    	if (dir == 'E') {
-    		System.out.println(this.id + " is moving east");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 1, 0, 'e');
-    		}
-    	if (dir == 'S') {
-    		System.out.println(this.id + " is moving south");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), 0, 1, 's');
-    		}
-    	if (dir == 'W') {
-    		System.out.println(this.id + " is moving west");
-    		b.move(this.getLocation().getX(), this.getLocation().getY(), -1, 0, 'w');
-    	}
-    	
-    	
     }
 
 

@@ -21,25 +21,27 @@ public class GameMain
     private Deck deck;
     private List<Player> players;
     private ArrayList<Player> Players = new ArrayList<>();
-    private ArrayList<Characters> PlayableCharcters = new ArrayList<Characters>();
+    private ArrayList<Characters> PlayableCharcters = new ArrayList();
     private ArrayList<Characters> ActiveCharacters = new ArrayList<>();
-    private ArrayList<Room> PlayableRooms = new ArrayList<Room>();
-    private ArrayList<Weapons> PlayableWeapons = new ArrayList<Weapons>();
+    private ArrayList<Room> PlayableRooms = new ArrayList();
+    private ArrayList<Weapons> PlayableWeapons = new ArrayList();
     private List<boardSpot> boardSpots;
     private List<BoardEntity> boardEntities;
+    
     //ArrayList<Card> inactive;
     //ArrayList<Card> active;
     public int diceone;
     public int dicetwo;
     public  int numpeople;
     Board aBoard = new Board(PlayableWeapons, ActiveCharacters, PlayableRooms, this);
+    Boolean gameover = false;
     //Deck aDeck = new Deck(active, inactive, this);
 
     //------------------------
     // CONSTRUCTOR
     //------------------------
 
-	public GameMain()
+    public GameMain()
     {
         /*
         if (aBoard == null || aBoard.getGameMain() != null)
@@ -54,40 +56,34 @@ public class GameMain
         */
         //Deck deck;
         players = new ArrayList<Player>();
-        
+
         GenerateWeapons();
         GenerateRooms();
         GenerateStartCharacters();
         chooseCharacters();
         fillDeck();
-        
-        for (Characters c : ActiveCharacters) {
-        	aBoard.addCharacter(c.getId(), c.getLocation());
-        }
-        
-        
-        for (Characters c : ActiveCharacters) {
-        	c.move(aBoard, 'E');
-        }
-        
-        System.out.println(aBoard.printArray());	//Just a test for printing out the board.
-        
-        //GenerateMurder();
-        //dealCards();
+        GenerateMurder();
+        dealCards();
+        playGame();
 
 
     }
-
-
-
+    
+    public void playGame() {
+    	while (gameover == false) {
+    		for (Player p : Players) {
+    			takeTurn(p);
+    		}
+    		
+    	}
+    	
+    }
 
     public void GenerateMurder(){
-    	/*
         Random MurderRoomNum = new Random();
         Random MurderPlayerNum = new Random();
         Random MurderWeaponNum = new Random();
-        //System.out.println(PlayableRooms.size());
-        //int mr = MurderRoomNum.nextInt(PlayableRooms.size() );
+        int mr = MurderRoomNum.nextInt(10 );
         int mp = MurderPlayerNum.nextInt(ActiveCharacters.size()  );
         int mw = MurderWeaponNum.nextInt(PlayableWeapons.size() );
 
@@ -95,7 +91,7 @@ public class GameMain
         for (Characters c : ActiveCharacters){
             CharacterNames.add(c.getName());
         }
-        
+
         ArrayList<Card> activecards = deck.getActive();
         for (Room r : PlayableRooms){
             // get id nu,bers of rooms and match them
@@ -107,7 +103,6 @@ public class GameMain
                 }
             }
         }
-        
         ArrayList<String> weaponnames = new ArrayList<>();
         weaponnames.add("Candlestick");
         weaponnames.add("Dagger");
@@ -145,8 +140,196 @@ public class GameMain
             }
         }
 
-        */
+
     }
+
+    public void takeTurn(Player p){
+        System.out.println("it is " + p.getName() + "'s turn: \n would you like to move or make an accusation? press m for move or a for accusation ");
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        try {
+            String answer = br.readLine();
+            if (answer.equals("m") || answer.equals("M")){
+            	rollDice();
+            	int totalmove = diceone + dicetwo;
+            	System.out.println("you rolled a " + diceone + " and a "+ dicetwo + " you can move " + totalmove + " tiles");
+            	
+            	
+
+            } else if (answer.equals("a") || answer.equals("A")) {
+            	boardSpot playerLocation = p.getCharacter().getLocation();
+            	/*
+            	 * figure out if they are in a room
+            	 */
+            	Room roomPLayerIsIn = null;
+            	for (Room r : PlayableRooms) {
+            		ArrayList corn = r.getCorners();
+            		boardSpot tlc = (boardSpot) corn.get(0);
+            		boardSpot blc = (boardSpot) corn.get(1);
+            		boardSpot brc = (boardSpot) corn.get(2);
+            		boardSpot trc = (boardSpot) corn.get(3);
+            		if (playerLocation.getX() >= tlc.getX() && playerLocation.getY() >= tlc.getY()) {
+            			if ( playerLocation.getY() <= blc.getY()) {
+            				if (playerLocation.getX() <= brc.getX() && playerLocation.getY() <= tlc.getY()) {
+            					if( playerLocation.getY() >= trc.getY()) {
+                        			roomPLayerIsIn = r;
+                        		}
+                    		}
+                		}
+            		}
+            	}
+            	if (roomPLayerIsIn == null) {
+            		System.out.println("you cannot make an accusation as you are not in a room");
+            		return;
+            	}
+            	System.out.println("the cards you have seen are ");
+            	for (int i = 0; i < p.getSeen().size(); i++) {
+            		Card m = (Card) p.getSeen().get(i);
+            		System.out.println(m.getName());
+            	}
+            	Iterator<Card> hand = p.getHand().iterator();
+                while(hand.hasNext()){
+                	System.out.println(hand.next().getName());
+                }
+                
+            	/*
+            	 * choose room for accusation
+            	 */
+                
+                System.out.println("the room for your accusation is " + roomPLayerIsIn);
+                
+                
+                Room chosenRoom = roomPLayerIsIn;
+                
+                /*
+                 * choose weapon for arrusation
+                 */
+                System.out.println("The weapons are ");
+                int num = 0;
+                
+                for(Weapons w :PlayableWeapons) {
+                	System.out.println(num + " : " + w.getName());
+                	num++;
+                }
+                System.out.println("please choose a weapon for your accusation");
+                int a = 0;
+                answer = br.readLine();
+                a = Integer.parseInt(answer);
+                Weapons chosenWeapon = PlayableWeapons.get(a);
+                
+                /*
+                 * choose character for accusation
+                 */
+                
+                System.out.println("The characters are ");
+                num = 0;
+                
+                for(Characters c :ActiveCharacters) {
+                	if(!p.getCharacter().getName().contentEquals(c.getName())) {
+                		System.out.println(c.getId() + " : " + c.getName());
+                    	num++;                                                    // dont display the option for the palyers own character
+                	}
+                	
+                }
+                System.out.println("please choose a character for your accusation");
+               
+                answer = br.readLine();
+                a = Integer.parseInt(answer);
+                Characters chosenCharacters = ActiveCharacters.get(a-1);
+                
+                System.out.println("your accusation is " + chosenCharacters.getName() + " in the " + chosenRoom.getName() + " with the " + chosenWeapon.getName());
+                makeAccusation(chosenCharacters, chosenRoom, chosenWeapon);
+                Player accused = null;
+                for (Player pa : Players) {
+                	String name = pa.getCharacter().getName();
+                	if (name.contentEquals(chosenCharacters.getName())) {
+                		accused = pa;
+                	}
+                }
+                Card ca = checkOpsHand(p,accused, chosenRoom, chosenCharacters, chosenWeapon );
+                if(ca == null) {
+                	System.out.println("the accused has no cards you havnet already seen");
+                }
+                System.out.println(accused.getName() + " has shown you " + ca.getName());
+                p.getSeen().add(ca);
+                
+                
+                
+            }
+        }catch(IOException ioerror){
+            System.out.println("io exception");
+        }
+
+    }
+    
+    public Card checkOpsHand(Player accusaer, Player accused, Room r, Characters c, Weapons w) {
+    	HashSet handofop = accused.getHand();
+    	Iterator<Card> hand = accused.getHand().iterator();
+        while(hand.hasNext())
+        {
+        	String name = hand.next().getName();
+            if(name.contentEquals(r.getName())) {
+            	if (!accusaer.getSeen().contains(hand.next())){
+            		return hand.next();
+            	}
+            	
+            }
+            
+            if(name.contentEquals(c.getName())) {
+            	if (!accusaer.getSeen().contains(hand.next())){
+            		return hand.next();
+            	}
+            }
+			if(name.contentEquals(w.getName())) {
+				if (!accusaer.getSeen().contains(hand.next())){
+					return hand.next();
+				}
+			}
+        }
+        return null;
+    	
+    			
+    }
+
+    public boolean makeAccusation(Characters a, Room b, Weapons c ){
+        int count = 0;
+        ArrayList<Card> activecards = deck.getActive();
+        for (Card card : activecards){
+            if (card.getIsMurderCard()){
+                if (card.getName().equals(a.getName())){
+                    count++;
+                }
+                if (card.getName().equals(b.getName())){
+                    count++;
+                }
+                if (card.getName().equals(c.getName())){
+                    count++;
+                }
+
+            }
+        }
+        if (count == 3){
+        	System.out.println("your accusation was the correct solution ");
+        	gameover = true;
+            return true;
+        }
+        System.out.println("your accusation was not the correct soltion");
+        return false;
+
+    }
+
+    public void lookAtHand(Player p){
+        HashSet h = p.getHand();
+        Iterator<Card> hand = p.getHand().iterator();
+        System.out.println("Player " + p.getName() + "'s hand has in it ");
+        while(hand.hasNext())
+        {
+            System.out.println(hand.next().getName());
+        }
+
+    }
+
+
 
 
     public void fillDeck(){
@@ -173,12 +356,9 @@ public class GameMain
         }
 
         for (Card c : active) {
-            System.out.println(c.getName());
+            //System.out.println(c.getName());
         }
-        System.out.println("inactive cards are ");
-        for (Card c : inactive) {
-            System.out.println(c.getName());
-        }
+
     }
 
     public void dealCards(){
@@ -190,28 +370,27 @@ public class GameMain
         for (Player p : Players){
             HashSet<Card> hand = new HashSet<>();
             for (int j = 0; j <  activecards.size(); j++) {
+                if ((pos + Players.size()) > activecards.size()){
+                    break;
+                }
                 if(!activecards.get(pos).getIsMurderCard()){
                     hand.add(activecards.get(pos));
-                    if ((pos + Players.size()) > activecards.size()){
-                        break;
-                    }
+
                 }
                 pos  = pos + Players.size();
             }
             p.setHand(hand);
+            //System.out.println(p.getHand().size());
+
+
             i++;
+            pos = i;
         }
-        System.out.println("please work");
-        System.out.println(Players.get(0).getName());
-        Iterator<Card> k= Players.get(0).getHand().iterator();
-        while(k.hasNext())
-        {
-            System.out.println(k.next());
-        }
+
     }
 
 
-    public GameMain(ArrayList<Weapons> aWeaponsForBoard, ArrayList<Characters> aCharactersForBoard, ArrayList<Room> aRoomsForBoard, ArrayList aActiveForDeck, ArrayList aInactiveForDeck)
+    public GameMain(ArrayList aWeaponsForBoard, ArrayList aCharactersForBoard, ArrayList aRoomsForBoard, ArrayList aActiveForDeck, ArrayList aInactiveForDeck)
     {
         board = new Board(aWeaponsForBoard, aCharactersForBoard, aRoomsForBoard, this);
         deck = new Deck(aActiveForDeck, aInactiveForDeck, this);
@@ -248,13 +427,15 @@ public class GameMain
             PlayableWeapons.add(a);
         }
     }
+    
+    
     public void GenerateRooms(){
         System.out.println("rooms");
         int pos = 0;
 
 
         try {
-            File file = new File("C:\\Users\\aidan\\IdeaProjects\\SWEN225_A1\\src\\roomData.txt");
+            File file = new File("C:\\Users\\aidan\\eclipse-workspace\\swen225_a1\\src\\roomData.txt");
             Scanner input = new Scanner(file);
             BufferedReader br = new BufferedReader(new FileReader(file));
             input = new Scanner(file);
@@ -308,9 +489,9 @@ public class GameMain
                         j = p + 1;
                     }
 
-                    System.out.println(pos);
+                   // System.out.println(pos);
                     Room r = new Room(aBoard ,name, corners, notAvailable, doors, PlayableRooms.size());
-                    System.out.println("room number is " + PlayableRooms.size());
+                    //System.out.println("room number is " + PlayableRooms.size());
                     pos++;
                     PlayableRooms.add(r);
                 }
@@ -322,32 +503,15 @@ public class GameMain
         }
         System.out.println("clear");
         for (Room r : PlayableRooms) {
+        	/*
             System.out.println(r.getName());
-
-
             System.out.println("corners " + r.getCorners().size());
             System.out.println("not avilable " + r.getNotAvilable().size());
             System.out.println("doors " + r.getDoors().size());
             System.out.println(" ");
+            */
         }
     }
-    
-    public String showBoardDetails() {
-    	String message = 	"Rooms:			Weapons:\n" + 
-    						" - (K)itchen		 - Candlestick\n" + 
-    						" - (D)ining Room	 - Dagger\n" + 
-    						" - (L)ounge		 - Lead Pipe\n" + 
-    						" - (B)all Room		 - Revolver\n" + 
-    						" - (C)onservatory	 - Rope\n" + 
-    						" - B(I)llard Room	 - Spanner\n" + 
-    						" - Lib(R)ary		 \n" + 
-    						" - (S)tudy\n" + 
-    						" - (H)all\n";
-    			
-    	return message;
-    }
-    
-    
     public void GenerateStartCharacters(){
         System.out.println("characters");
         /*
@@ -411,17 +575,13 @@ public class GameMain
                 String answer = br.readLine();
                 Characters c = null;
                 for (Characters x : PlayableCharcters){
-                	//System.out.println("======================================== "+ answer +" ======================================");
                     if (x.getName().equals(answer)){
                         c = x;
                     }
                 }
-                HashSet<Card> h = new HashSet<Card>();
+                HashSet h = new HashSet();
                 ArrayList s = new ArrayList();
                 Player p = new Player(h,s, c,i, this, answer);
-                //System.out.println("ID: " + i);
-                //System.out.println("Location: " + c.getLocation().getX());
-                //aBoard.addCharacter(i, c.getLocation());
                 Players.add(p);
             }
 
@@ -460,7 +620,8 @@ public class GameMain
                     p.setCharacter(PlayableCharcters.get(num));
                 }
                 if (player != null) {
-                    System.out.println("You have selected your player,  you are " + PlayableCharcters.get(num).getName() + " and your start postion is ( " + PlayableCharcters.get(num).getLocation() + " )");
+                    System.out.println("You have selected your player,  you are " + PlayableCharcters.get(num).getName() + " and your start postion is ( " + 
+                PlayableCharcters.get(num).getLocation().getX() + "," + PlayableCharcters.get(num).getLocation().getY() + " )");
                 }
             } catch (IOException wronginput) {
                 System.out.println("io exception");
@@ -531,7 +692,7 @@ public class GameMain
         return 6;
     }
     /* Code from template association_AddMNToOnlyOne */
-    public Player addPlayer(HashSet<Card> aHand, ArrayList aSeen, Characters aCharacter, int aId)
+    public Player addPlayer(HashSet aHand, ArrayList aSeen, Characters aCharacter, int aId)
     {
         if (numberOfPlayers() >= maximumNumberOfPlayers())
         {
