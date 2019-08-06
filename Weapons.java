@@ -30,4 +30,12 @@ public class Weapons extends Piece
         super.delete();
     }
 
+	@Override
+	void move(Board b, char dir) {
+		// TODO Auto-generated method stub
+		
+	}
+    
+    
+
 }

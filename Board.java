@@ -6,6 +6,8 @@ import java.util.*;
 
 // line 9 "model.ump"
 // line 86 "model.ump"
+
+
 public class Board
 {
 
@@ -15,8 +17,37 @@ public class Board
 
     //Board Attributes
     private ArrayList weapons;
-    private ArrayList characters;
+    private ArrayList<Characters> characters;
     private ArrayList rooms;
+    private int WIDTH = 24;
+    private int HEIGHT = 25;
+    private char[][] boardArray = new char[][] {
+    							  {'X','X','X','X','X','X','X','X','X',' ','X','X','X','X',' ','X','X','X','X','X','X','X','X','X'},//0
+    		 					  {'K','K','K','K','K','K','X',' ',' ',' ','B','B','B','B',' ',' ',' ','X','C','C','C','C','C','C'},//1
+    		 					  {'K','K','K','K','K','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ','C','C','C','C','C','C'},//2
+    		 					  {'K','K','K','K','K','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ','C','C','C','C','C','C'},//3
+    		 					  {'K','K','K','K','K','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ','n','C','C','C','C','C'},//4
+    		 					  {'K','K','K','K','K','K',' ',' ','e','B','B','B','B','B','B','w',' ',' ',' ','C','C','C','C','X'},//5
+    		 					  {'X','K','K','K','n','K',' ',' ','B','B','B','B','B','B','B','B',' ',' ',' ',' ',' ',' ',' ',' '},//6
+    		 					  {' ',' ',' ',' ',' ',' ',' ',' ','B','B','B','B','B','B','B','B',' ',' ',' ',' ',' ',' ',' ','X'},//7
+    		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//8
+    		 					  {'D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','e','I','I','I','I','I'},//9
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//10
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','I','I'},//11
+    		 					  {'D','D','D','D','D','D','D','w',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','I','I','I','I','n','I'},//12
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','X'},//13
+    		 					  {'D','D','D','D','D','D','D','D',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','s','R','R','X'},//14
+    		 					  {'D','D','D','D','D','D','n','D',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','R','R','R','R','R'},//15
+    		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','e','R','R','R','R','R','R'},//16
+    		 					  {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','R','R','R','R','R','R','R'},//17
+    		 					  {'X',' ',' ',' ',' ',' ',' ',' ',' ','H','H','s','s','H','H',' ',' ',' ','R','R','R','R','R','X'},//18
+    		 					  {'L','L','L','L','L','L','s',' ',' ','H','H','H','H','H','H',' ',' ',' ',' ',' ',' ',' ',' ',' '},//19
+    		 					  {'L','L','L','L','L','L','L',' ',' ','H','H','H','H','H','w',' ',' ',' ',' ',' ',' ',' ',' ',' '},//20
+    		 					  {'L','L','L','L','L','L','L',' ',' ','H','H','H','H','H','H',' ',' ','s','S','S','S','S','S','S'},//21
+    		 					  {'L','L','L','L','L','L','L',' ',' ','H','H','H','H','H','H',' ',' ','S','S','S','S','S','S','S'},//22
+    		 					  {'L','L','L','L','L','L','L',' ',' ','H','H','H','H','H','H',' ',' ','S','S','S','S','S','S','S'},//23
+    		 					  {'L','L','L','L','L','L','X',' ','X','H','H','H','H','H','H','X',' ','X','S','S','S','S','S','S'},};//24
+    		 					  //0   1  	2  	3  	4  	5  	6  	7  	8  	9  	10  11  12  13  14  15  16  17  18  19  20  21  22  23
 
     //Board Associations
     private List<boardSpot> boardSpots;
@@ -252,9 +283,9 @@ public class Board
         return 21;
     }
     /* Code from template association_AddMNToOnlyOne */
-    public BoardEntity addBoardEntity()
+    /*public BoardEntity addBoardEntity()
     {
-        if (numberOfBoardEntities() >= maximumNumberOfBoardEntities())
+        if (numberOfBoardEntities() >= maximumNumberOfBoardEntities())				//GIVES ERROR
         {
             return null;
         }
@@ -262,7 +293,7 @@ public class Board
         {
             return new BoardEntity(this);
         }
-    }
+    }*/
 
     public boolean addBoardEntity(BoardEntity aBoardEntity)
     {
@@ -341,4 +372,149 @@ public class Board
                 "  " + "rooms" + "=" + (getRooms() != null ? !getRooms().equals(this)  ? getRooms().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
                 "  " + "gameMain = "+(getGameMain()!=null?Integer.toHexString(System.identityHashCode(getGameMain())):"null");
     }
+    
+    public String printArray() {
+    	String message = "";
+    	
+    	for (int i = 0; i < HEIGHT; i++) {
+    		for (int j = 0; j < WIDTH; j++) {
+    			message += boardArray[i][j];
+    		}
+    		message += "\n";
+    	}
+    	
+    	return message;
+    }
+    
+    
+    /**
+     * Moves a given tile in a given direction
+     */
+    public void move(int x, int y, int dx, int dy, char dir) {
+    	int newX = x+dx;
+    	int newY = y+dy;
+    	char direction = dir;
+    	
+    	System.out.println("new x pos: " + newX + ", new y pos: " + newY);
+    	
+    	if (moveIsValid(newX, newY, direction)) {	//if the move is valid
+    		char newLocation = boardArray[newY][newX];
+    		
+    		if(Character.isLowerCase(newLocation)) {	//handle entering a room
+    			char ID = boardArray[y][x];	//save current char
+	    		boardArray[y][x] = ' ';		//set old spot as blank
+	    		
+	    		char room = ' ';	//what room you move into
+	    		boardSpot b = null;
+	    		
+	    		if(newLocation == 'n') {
+	    			room = boardArray[newY+1][newX];
+	    			b = new boardSpot(newX, newY+1, true);
+	    			System.out.println("You move north into the room");
+    	        }
+	    		if(newLocation == 'e') {
+	    			room = boardArray[newY][newX+1];
+	    			b = new boardSpot(newX+1, newY, true);
+	    			System.out.println("You move east into the room");
+    	        }
+	    		if(newLocation == 's') {
+	    			room = boardArray[newY-1][newX];
+	    			b = new boardSpot(newX, newY-1, true);
+	    			System.out.println("You move south into the room");
+    	        }
+	    		if(newLocation == 'w') {
+	    			room = boardArray[newY][newX-1];
+	    			b = new boardSpot(newX-1, newY, true);
+	    			System.out.println("You move west into the room");
+	    	    }
+	    	
+	    		Characters c = null;
+	    		for (int i = 0; i < characters.size(); i++) {
+	    			if(characters.get(i).getId() == ID) {
+	    				c = characters.get(i);
+	    				c.setLocation(b);//update location
+	    			}
+	    		}
+	    		
+	    	    //if(room == 'K') {}
+	    	    //if(room == 'D') {}
+	    	    //if(room == 'L') {}
+	    	    //if(room == 'B') {}
+	    	    //if(room == 'C') {}
+	    	    //if(room == 'I') {}
+	    	    //if(room == 'R') {}
+	    	    //if(room == 'S') {}
+	    	    //if(room == 'H') {}
+	    	        		
+    			
+    		} else {	//handle moving a boardspot.
+	    		char ID = boardArray[y][x];	//save current char
+	    		boardArray[y][x] = ' ';		//set old spot as blank
+	    		boardArray[newY][newX] = ID;//set new spot as the character
+	    		
+	    		boardSpot b = new boardSpot(newX, newY, true);
+	    		for (int i = 0; i < characters.size(); i++) {
+	    			if(characters.get(i).getId() == Character.getNumericValue(ID)) {
+	    				characters.get(i).setLocation(b);
+	    			}
+	    		}
+    		}
+        	
+    	}
+    	
+    	
+    }
+    
+    public boolean moveIsValid(int newXpos, int newYpos, char dir) {
+    	//check if out of bounds
+    	if(newXpos > WIDTH-1 || newXpos < 0) {
+    		System.out.println("fail, can not move out of bounds");
+    		return false;
+    	}
+    	if(newYpos > HEIGHT-1 || newYpos < 0) {
+    		System.out.println("fail, can not move out of bounds");
+    		return false;
+    	}
+
+    	char newLocation = boardArray[newYpos][newXpos];
+    	
+    	if (Character.isLowerCase(newLocation)) {	//handle door
+    		if (dir != newLocation) {
+    			System.out.println("fail, you must move into the door from the given direction, " + newLocation);
+    			return false;
+    		} else {
+    			System.out.println("you moved through the door");
+    			return true;
+    		}
+    	}
+    	
+    	if (newLocation == ' '|| newLocation == 'n' || newLocation == 'e' || newLocation == 's' || newLocation == 'w') {
+    		System.out.println("move was completed");
+    		return true;
+    	} else {
+    		System.out.println("fail, you can only move into a free tile");
+    		return false;
+    	}
+    }
+    
+    /**
+     * Leave room though a given door and update
+     * new position.
+     */
+    public void leaveRoom() {
+    	
+    }
+    
+    
+    /**
+     * Adds character in spot when selected
+     */
+    public void addCharacter (int id, boardSpot bs) {
+    	//System.out.println("ID: " + id + " x: " + bs.getX() + " y: " + bs.getY());
+    	if(boardArray[bs.getY()][bs.getX()] == ' ') {	//only add to a 
+    		boardArray[bs.getY()][bs.getX()] = (char) (id+'0');	// had to cast to int by adding the ascii value of '0' to it.
+    	}
+    }
+    
+    
 }
